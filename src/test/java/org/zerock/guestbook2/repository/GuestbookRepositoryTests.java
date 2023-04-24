@@ -1,10 +1,17 @@
 package org.zerock.guestbook2.repository;
 
+import com.querydsl.core.BooleanBuilder;
+import com.querydsl.core.types.dsl.BooleanExpression;
 import jakarta.transaction.Transactional;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.zerock.guestbook2.Entity.Guestbook;
+import org.zerock.guestbook2.Entity.QGuestbook;
 
 import java.util.Optional;
 import java.util.stream.IntStream;
@@ -50,7 +57,7 @@ public class GuestbookRepositoryTests {
     @Transactional
     @Test
     public void getTest2(){
-        Long no = 1L;
+        Long no = 3L;
 
        Guestbook book = guestbookRepository.getOne(no);
 
@@ -83,5 +90,58 @@ public class GuestbookRepositoryTests {
         guestbookRepository.deleteById(no1);
         guestbookRepository.deleteById(no2);
     }
+
+    @Test
+    public void testQuery1(){
+
+        Pageable pageable = PageRequest.of(0, 10, Sort.by("gno").descending());
+
+        QGuestbook qGuestbook = QGuestbook.guestbook;
+
+        String keyword = "1";
+
+        BooleanBuilder builder = new BooleanBuilder();
+
+        BooleanExpression expression = qGuestbook.title.contains(keyword);
+
+        builder.and(expression);
+
+        Page<Guestbook> result = guestbookRepository.findAll(builder, pageable);
+
+        result.stream().forEach(i -> {
+            System.out.println(i);
+        });
+
+    }
+
+    @Test
+    public void testQuery2(){
+
+        Pageable pageable = PageRequest.of(0, 10, Sort.by("gno").descending());
+
+        QGuestbook qGuestbook = QGuestbook.guestbook;
+
+        String keyword = "1";
+
+        BooleanBuilder builder = new BooleanBuilder();
+
+        BooleanExpression exTitle = qGuestbook.title.contains(keyword);
+
+        BooleanExpression exContent = qGuestbook.content.contains(keyword);
+
+        BooleanExpression exAll = exTitle.or(exContent);
+
+        builder.and(exAll);
+
+        builder.and(qGuestbook.gno.gt(0L));
+
+        Page<Guestbook> result = guestbookRepository.findAll(builder, pageable);
+
+        result.stream().forEach(i ->{
+            System.out.println(i);
+        });
+    }
+
+
 
 }
