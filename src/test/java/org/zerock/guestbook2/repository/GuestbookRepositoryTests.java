@@ -7,6 +7,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.zerock.guestbook2.Entity.Guestbook;
 
 import java.util.Optional;
+import java.util.stream.IntStream;
 
 @SpringBootTest
 public class GuestbookRepositoryTests {
@@ -21,11 +22,15 @@ public class GuestbookRepositoryTests {
 
     @Test
     public void insertTest(){
-        Guestbook book = Guestbook.builder()
-                .title("title2")
-                .content("content2")
-                .writer("writer2").build();
-        guestbookRepository.save(book);
+
+        IntStream.rangeClosed(1, 300).forEach(i -> {
+            Guestbook book = Guestbook.builder()
+                    .title("title" + i)
+                    .content("content" + i)
+                    .writer("writer" + i).build();
+            guestbookRepository.save(book);
+        });
+
     }
 
     @Test
@@ -56,11 +61,18 @@ public class GuestbookRepositoryTests {
 
     @Test
     public void updateTest(){
-        Guestbook book = Guestbook.builder().gno(1L)
-                .title("update1")
-                .content("update1")
-                .writer("update1").build();
-        guestbookRepository.save(book);
+
+        Optional<Guestbook> result = guestbookRepository.findById(3L);
+
+        if(result.isPresent()){
+            Guestbook book = result.get();
+            book.changeTitle("change title");
+            book.changeContent("changed content");
+
+            guestbookRepository.save(book);
+        }
+
+
     }
 
 
