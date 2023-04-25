@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Title</title>
+</head>
+<body>
+<th:block th:replace="~{layout/basic :: setContent(~{this :: content})}">
+
+  <th:block th:fragment="content">
+
+    <h1 class="mt-4">Guestbook Modify Page</h1>
+
+    <form th:action="@{/guestbook/modify}" th:method="post">
+
+      <input type="hidden" name="page" th:value="${requestDTO.page}">
+
+      <div class="form-group">
+        <label>NO</label>
+        <input type="text" class="form-control" name="gno" th:value="${dto.gno}" readonly="readonly">
+      </div>
+
+      <div class="form-group">
+        <label>Title</label>
+        <input type="text" class="form-control" name="title" th:value="${dto.title}">
+      </div>
+
+      <div class="form-group">
+        <label>Content</label>
+        <textarea class="form-control" rows="5" name="content">[[${dto.content}]]</textarea>
+      </div>
+
+      <div class="form-group">
+        <label>Writer</label>
+        <input type="text" class="form-control" name="writer" th:value="${dto.writer}" readonly="readonly">
+      </div>
+
+      <div class="form-group">
+        <label>RegDate</label>
+        <input type="text" class="form-control" th:value="${#temporals.format(dto.regDate, 'yyyyy/MM/dd')}" readonly="readonly">
+      </div>
+
+      <div class="form-group">
+        <label>ModDate</label>
+        <input type="text" class="form-control" th:value="${#temporals.format(dto.modDate, 'yyyy/MM/dd')}" readonly="readonly">
+      </div>
+    </form>
+
+    <button type="button" class="btn btn-primary modifyBtn">Modify</button>
+    <button type="button" class="btn btn-info deleteBtn">Delete</button>
+    <button type="button" class="btn btn-danger listBtn">List</button>
+
+  </th:block>
+
+</th:block>
+
+<script th:inline="javascript">
+
+  var actionForm = $("form");
+
+  $(".deleteBtn").on("click", function(){
+
+    actionForm.attr("action", "/guestbook/remove");
+    actionForm.submit();
+
+  });
+
+  $(".modifyBtn").on("click", function (){
+
+    if(!confirm("수정하시겠습니까?")){
+      return;
+    }
+    actionForm.submit();
+  });
+
+  $(".listBtn").on("click", function (){
+
+    var pageInfo = $("input[name=page]");
+
+    actionForm.empty();
+    actionForm.append(pageInfo);
+    actionForm.attr("action", "/guestbook/list");
+    actionForm.attr("method", "get").submit();
+
+  });
+
+</script>
+</body>
+</html>
